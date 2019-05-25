@@ -1,4 +1,7 @@
-# Project 5: Enhancement: currency-conversion-service
+# Project 5: Enhancement-2: currency-conversion-service
+
+Implementation of load balancer using Ribbon - 
+	If multiple instance of currency-exchange-service is executing then instead of configuring hard coded url/port, load balancer           ribbon will be used.
 
   5.1 CurrencyConversionBean.java (pojo)
     
@@ -37,6 +40,7 @@
   
     spring.application.name=currency-conversion-service
     server.port=8100
+    currency-exchange-service.ribbon.listOfServers=http://localhost:8000,http://localhost:8001
   
   5.4 CurrencyConversionServiceApplication.java
   
@@ -50,7 +54,8 @@
      
   5.5 CurrencyExchangeServiceProxy.java
   
-    @FeignClient(name="currency-exchange-service", url="localhost:8000")
+    @FeignClient(name="currency-exchange-service")
+    @RibbonClient(name="currency-exchange-service")
     public interface CurrencyExchangeServiceProxy {
 	      @GetMapping("/currency-exchange/from/{from}/to/{to}")
 	      public CurrencyConversionBean retrieveExchangeValue(@PathVariable("from") String from, @PathVariable("to") String to);
