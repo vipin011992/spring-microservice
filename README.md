@@ -192,25 +192,18 @@ Step wise microservice tutorial
   
     @RestController
     public class CurrencyConversionController {
-	    
-       @GetMapping("/currency-converter/from/{from}/to/{to}/quantity/{quantity}")
-	     public CurrencyConversionBean convertCurrency(@PathVariable String from,	@PathVariable String to,
-          @PathVariable BigDecimal quantity){
-		
-		      Map<String, String> uriVariables = new HashMap<>();
-		      uriVariables.put("from", from);
-		      uriVariables.put("to", to);
+    
+        @Autowired
+	private CurrencyExchangeServiceProxy proxy;    
+        
+        @GetMapping("/currency-converter-feign/from/{from}/to/{to}/quantity/{quantity}")
+	public CurrencyConversionBean convertCurrencyFeign(@PathVariable String from, @PathVariable String to,
+			    @PathVariable BigDecimal quantity) {
 
-		      ResponseEntity<CurrencyConversionBean> responseEntity = new RestTemplate().getForEntity(
-				                "http://localhost:8000/currency-exchange/from/{from}/to/{to}", 
-				                CurrencyConversionBean.class, 
-				                uriVariables );
-		
-		      CurrencyConversionBean response = responseEntity.getBody();
-		
-		      return new CurrencyConversionBean(response.getId(),from,to,response.getConversionMultiple(),
-				                    quantity,quantity.multiply(response.getConversionMultiple()),response.getPort()); 
-	      }
+		CurrencyConversionBean response = proxy.retrieveExchangeValue(from, to);
+		return new CurrencyConversionBean(response.getId(), from, to, response.getConversionMultiple(), quantity,
+				        quantity.multiply(response.getConversionMultiple()), response.getPort());
+	 }
     }
   
   5.3 application.properties
@@ -221,12 +214,20 @@ Step wise microservice tutorial
   5.4 CurrencyConversionServiceApplication.java
   
      @SpringBootApplication
+     @EnableFeignClients("{replace_this_with_package_of_proxy_interface_CurrencyExchangeServiceProxy}")
      public class CurrencyConversionServiceApplication {
         public static void main(String[] args) {
 		      SpringApplication.run(CurrencyConversionServiceApplication.class, args);
 	      }
      }
   
+   5.5 CurrencyExchangeServiceProxy.java
+  
+    @FeignClient(name="currency-exchange-service", url="localhost:8000")
+    public interface CurrencyExchangeServiceProxy {
+	 @GetMapping("/currency-exchange/from/{from}/to/{to}")
+	 public CurrencyConversionBean retrieveExchangeValue(@PathVariable("from") String from, @PathVariable("to") String to);
+    }
   
    
   
