@@ -213,12 +213,14 @@ Step wise microservice tutorial
   
     spring.application.name=currency-conversion-service
     server.port=8100
-    currency-exchange-service.ribbon.listOfServers=http://localhost:8000,http://localhost:8001
+    #currency-exchange-service.ribbon.listOfServers=http://localhost:8000,http://localhost:8001
+    eureka.client.service-url.default-zone=http://localhost:8761/eureka
   
   5.4 CurrencyConversionServiceApplication.java
   
      @SpringBootApplication
      @EnableFeignClients("{replace_this_with_package_of_proxy_interface_CurrencyExchangeServiceProxy}")
+     @EnableDiscoveryClient
      public class CurrencyConversionServiceApplication {
         public static void main(String[] args) {
 		      SpringApplication.run(CurrencyConversionServiceApplication.class, args);
