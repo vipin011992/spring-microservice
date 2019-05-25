@@ -2,6 +2,7 @@
   #3.Project - spring-cloud-config-server
   
   3.1 Link "git-localconfig-repo" to this project as source
+  
   3.2 springCloudConfigServerApplication.java
   
       @EnableConfigServer
