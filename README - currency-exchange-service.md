@@ -1,73 +1,61 @@
-# spring-microservice
-Step wise microservice tutorial
-
-
-  #1.Project - limit-service
-  
-  1.1 LimitConfiguration.java (pojo)
-      
-      class LimitConfiguration{
-          @Getter @setter
-          int maximum,minimum;
-      }
-      
-   1.2 application.properties
-      
-      spring.application.name=limit-service
-      limit-service.minimum=9
-      limit-service.maximum=999
-      
-   1.3 Configuration.java
+# 4. Project - currency-exchange-service
    
-      @Component
-      @ConfigurationProperties("limit-service")
-      class configuration{
-        @Getter @Setter
-        private int minimum,maximum;
-      }
+  4.1 ExchangeValueRepository.java
   
-  1.4 LimitConfigurationController.java
-  
-      @RestController
-      class LimitConfigurationController{
-        
-        @Autowired private Configuration configuration;
-        
-        @GetMapping("/limits")
-        public LimitConfiguration retrieveData(){
-            return new LimitConfiguration(configuration.getMaximum(), configurtion.getMinimum());
-        }
-        
-      }
+     public interface ExchangeValueRepository extends JpaRepository<ExchangeValue, Long>{
+	      ExchangeValue findByFromAndTo(String from, String to);
+     }
       
+  4.2 CurrencyExchangeServiceApplication.java
+  
+    @SpringBootApplication
+    public class CurrencyExchangeServiceApplication {
+	    public static void main(String[] args) {
+		    SpringApplication.run(CurrencyExchangeServiceApplication.class, args);
+	    }
+    }
+  
+  4.3 ExchangeValue.java
+  
+    @Entity
+    @Getter @Setter @No-arg-constructor @arg-constructor
+    public class ExchangeValue {
+	
+	    @Id
+	    private Long id;
+	
+	    @Column(name="currency_from")
+	    private String from;
+	
+	    @Column(name="currency_to")
+	    private String to;
+	
+	    private BigDecimal conversionMultiple;
+	    private int port;
+    }
+  
+  4.4 CurrencyExchangeController.java
+  
+    @RestController
+    public class CurrencyExchangeController {	
+	    @Autowired
+	    private Environment environment;
+	
+	    @Autowired
+	    private ExchangeValueRepository repository;
+	
+	    @GetMapping("/currency-exchange/from/{from}/to/{to}")
+	    public ExchangeValue retrieveExchangeValue (@PathVariable String from, @PathVariable String to){
+		    ExchangeValue exchangeValue = repository.findByFromAndTo(from, to);
+		    exchangeValue.setPort(Integer.parseInt(environment.getProperty("local.server.port")));
+		    return exchangeValue;
+	    }
+    } 
+  
+  4.5 application.properties
       
-   1.5 LimitServiceApplication.java
-       
-       @SpringBootApplication
-       class LimitServiceApplication{
-           public static void main(String ...s){
-              SpringApplication.run(LimitServiceApplication.class,args);
-           }
-       }
-   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+      spring.application.name=currency-exchange-service
+      server.port=8000
+      spring.jpa.show-sql=true
+      spring.h2.console.enabled=true
+      
