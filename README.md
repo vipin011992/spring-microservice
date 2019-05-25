@@ -97,20 +97,80 @@ Step wise microservice tutorial
   
   # Connecting limit-service to spring-cloud-config-server
 
-  4.1 In limit-service project make below changes
+  a. In limit-service project make below changes
   
       remove application.properties
       add bootstrap.properties 
           spring.application.name=limit-service
           spring.cloud.config.uri=http://localhost:8888
       
-  4.2 On the basis of spring.application.name property, it pick configration file from 'spring-cloud-config-server'
-  4.3 Here profile is not configured so default configuration file will be picked, configuration profile can be configured as 
+  b. On the basis of spring.application.name property, it pick configration file from 'spring-cloud-config-server'
+  c. Here profile is not configured so default configuration file will be picked, configuration profile can be configured as 
          
       spring.profiles.active=dev      
   If any property is not found in this file then default will be configured.
   
+  # 4. Project - currency-exchange-service
+   
+  4.1 ExchangeValueRepository.java
   
+     public interface ExchangeValueRepository extends JpaRepository<ExchangeValue, Long>{
+	      ExchangeValue findByFromAndTo(String from, String to);
+     }
+      
+  4.2 CurrencyExchangeServiceApplication.java
+  
+    @SpringBootApplication
+    public class CurrencyExchangeServiceApplication {
+	    public static void main(String[] args) {
+		    SpringApplication.run(CurrencyExchangeServiceApplication.class, args);
+	    }
+    }
+  
+  4.3 ExchangeValue.java
+  
+    @Entity
+    @Getter @Setter @No-arg-constructor @arg-constructor
+    public class ExchangeValue {
+	
+	    @Id
+	    private Long id;
+	
+	    @Column(name="currency_from")
+	    private String from;
+	
+	    @Column(name="currency_to")
+	    private String to;
+	
+	    private BigDecimal conversionMultiple;
+	    private int port;
+    }
+  
+  4.4 CurrencyExchangeController.java
+  
+    @RestController
+    public class CurrencyExchangeController {	
+	    @Autowired
+	    private Environment environment;
+	
+	    @Autowired
+	    private ExchangeValueRepository repository;
+	
+	    @GetMapping("/currency-exchange/from/{from}/to/{to}")
+	    public ExchangeValue retrieveExchangeValue (@PathVariable String from, @PathVariable String to){
+		    ExchangeValue exchangeValue = repository.findByFromAndTo(from, to);
+		    exchangeValue.setPort(Integer.parseInt(environment.getProperty("local.server.port")));
+		    return exchangeValue;
+	    }
+    } 
+  
+  4.5 application.properties
+      
+      spring.application.name=currency-exchange-service
+      server.port=8000
+      spring.jpa.show-sql=true
+      spring.h2.console.enabled=true
+      
   
   
   
