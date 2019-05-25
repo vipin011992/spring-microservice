@@ -121,6 +121,7 @@ Step wise microservice tutorial
   4.2 CurrencyExchangeServiceApplication.java
   
     @SpringBootApplication
+    @EnableDiscoveryClient
     public class CurrencyExchangeServiceApplication {
 	    public static void main(String[] args) {
 		    SpringApplication.run(CurrencyExchangeServiceApplication.class, args);
@@ -170,6 +171,7 @@ Step wise microservice tutorial
       server.port=8000
       spring.jpa.show-sql=true
       spring.h2.console.enabled=true
+      eureka.client.service-url.default-zone=http://localhost:8761/eureka
        
   
   # Project 5: currency-conversion-service
