@@ -41,6 +41,7 @@ Implementation of load balancer using Ribbon -
     spring.application.name=currency-conversion-service
     server.port=8100
     currency-exchange-service.ribbon.listOfServers=http://localhost:8000,http://localhost:8001
+
   
   5.4 CurrencyConversionServiceApplication.java
   
