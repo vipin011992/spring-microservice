@@ -1,76 +1,25 @@
-# Project 5: Enhancement: currency-conversion-service
+# Project 6: netflix-eureka-naming-server
 
-  5.1 CurrencyConversionBean.java (pojo)
+  6.1 NetflixEurekaNamingServerApplication.java 
     
-    @Getter @Setter @No-arg-constructor @arg-constructor
-    public class CurrencyConversionBean {
-	    private Long id;
-	    private String from;
-	    private String to;
-	    private BigDecimal conversionMultiple;
-	    private BigDecimal quantity;
-	    private BigDecimal totalCalculatedAmount;
-	    private int port;
+    @SpringBootApplication
+    @EnableEurekaServer
+    public class NetflixEurekaNamingServerApplication {
+	public static void main(String[] args) {
+		SpringApplication.run(NetflixEurekaNamingServerApplication.class, args);
+	}
     }
-
-
-  5.2 CurrencyConversionController.java
+ 
+  6.2 application.properties
   
-    @RestController
-    public class CurrencyConversionController {
-    
-        @Autowired
-	      private CurrencyExchangeServiceProxy proxy;    
-        
-        @GetMapping("/currency-converter-feign/from/{from}/to/{to}/quantity/{quantity}")
-	      public CurrencyConversionBean convertCurrencyFeign(@PathVariable String from, @PathVariable String to,
-			    @PathVariable BigDecimal quantity) {
-
-		      CurrencyConversionBean response = proxy.retrieveExchangeValue(from, to);
-
-		      return new CurrencyConversionBean(response.getId(), from, to, response.getConversionMultiple(), quantity,
-				        quantity.multiply(response.getConversionMultiple()), response.getPort());
-	      }
-    }
+    spring.application.name=netflix-eureka-naming-server
+    server.port=8761
+    eureka.client.register-with-eureka=false
+    eureka.client.fetch-registry=false
   
-  5.3 application.properties
+  6.3 execution url
   
-    spring.application.name=currency-conversion-service
-    server.port=8100
-  
-  5.4 CurrencyConversionServiceApplication.java
-  
-     @SpringBootApplication
-     @EnableFeignClients("{replace_this_with_package_of_proxy_interface_CurrencyExchangeServiceProxy}")
-     public class CurrencyConversionServiceApplication {
-        public static void main(String[] args) {
-		      SpringApplication.run(CurrencyConversionServiceApplication.class, args);
-	      }
-     }
-     
-  5.5 CurrencyExchangeServiceProxy.java
-  
-    @FeignClient(name="currency-exchange-service", url="localhost:8000")
-    public interface CurrencyExchangeServiceProxy {
-	      @GetMapping("/currency-exchange/from/{from}/to/{to}")
-	      public CurrencyConversionBean retrieveExchangeValue(@PathVariable("from") String from, @PathVariable("to") String to);
-    }
-  
-  
-   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  	http://localhost:8761
   
   
   
