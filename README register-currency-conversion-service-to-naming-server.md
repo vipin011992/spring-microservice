@@ -1,4 +1,4 @@
-# Project 5: Enhancement: currency-conversion-service
+# Project 5: Enhancement 3: currency-conversion-service
 
   5.1 CurrencyConversionBean.java (pojo)
     
