@@ -178,6 +178,11 @@ Step wise microservice tutorial
   
   Implementation of load balancer using Ribbon - 
 	If multiple instance of currency-exchange-service is executing then instead of configuring hard coded url/port, load balancer           ribbon will be used.
+	
+ Setting up Zuul API Gateway between microservice invocations -
+      
+       'currency-conversion-service' will invoked zuul api gateway 'netflix-zuul-api-gateway-server' and this will redirect invocation           to 'currency-exchange-service'
+	
 
   5.1 CurrencyConversionBean.java (pojo)
     
@@ -231,10 +236,12 @@ Step wise microservice tutorial
   
    5.5 CurrencyExchangeServiceProxy.java
   
-    @FeignClient(name="currency-exchange-service")
+    //@FeignClient(name="currency-exchange-service")
+    @FeignClient(name="netflix-zuul-api-gateway-server")
     @RibbonClient(name="currency-exchange-service")
     public interface CurrencyExchangeServiceProxy {
-	 @GetMapping("/currency-exchange/from/{from}/to/{to}")
+	 //@GetMapping("/currency-exchange/from/{from}/to/{to}")
+	 @GetMapping("/currency-exchange-service/currency-exchange/from/{from}/to/{to}")
 	 public CurrencyConversionBean retrieveExchangeValue(@PathVariable("from") String from, @PathVariable("to") String to);
     }
   
