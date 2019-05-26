@@ -74,17 +74,6 @@ spring.cloud.config.failFast=true
 
 ```
 
-
-# Distributed Tracing
-
-   In microservice, logger are stored for services separately in separate project structure, so it is very hard to trace
-   and debug any error, To resolve this distributed tracing comes in the picture.
-   
-# Distributed tracing via spring-cloud-slueth
-
-    It assign an uniqueId for all the request by which logger can be traced through this id.
-
-
   #1.Project - limit-service
   
   1.1 LimitConfiguration.java (pojo)
@@ -446,6 +435,14 @@ filterType :-
       currency-conversion-service - application name
       currency-conversion/from/INR/to/USD/quantity/10 - uri
   
+  # Distributed Tracing
+
+   In microservice, logger are stored for services separately in separate project structure, so it is very hard to trace
+   and debug any error, To resolve this distributed tracing comes in the picture.
+   
+# Distributed tracing via spring-cloud-slueth
+
+    It assign an uniqueId for all the request by which logger can be traced through this id.
   
   
   # Distributed Tracing via zipkin
