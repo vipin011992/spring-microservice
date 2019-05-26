@@ -404,7 +404,29 @@ Implementation steps -
           
   
   
+  # Spring cloud Bus
   
+  	1. Execute multiple instance of limit-service and make changes in limit-service-qa.properties and commit to the git.
+	In this case, changes will not be reflected without restarting of limit-service.
+	
+	To reflect changes, below url can be executed instead of restarting limit-service-
+	http://localhost:8080/application/refresh
+	http://localhost:8081/application/refresh
+		These calling must be performed for every instance.
+			
+	2. To get rid of limit-service restarting or api called multiple times, spring cloud bus mechanism can be used to reflect
+	changes.
+	
+	3. Steps to use Spring cloud bus :-
+	   3.1 Run rabbitMQ server
+	   3.2 Add dependencies in spring-cloud-config-server
+	   	{org.springframework.cloud, spring-cloud-starter-config}
+	   3.3 Now execute API to reflect changes in all the instances
+	   	http://localhost:8080/bus/refresh
+		
+	
+	
+	
   
   
   
