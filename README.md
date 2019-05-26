@@ -1,6 +1,15 @@
 # spring-microservice
 Step wise microservice tutorial
 
+# Distributed Tracing
+
+   In microservice, logger are stored for services separately in separate project structure, so it is very hard to trace
+   and debug any error, To resolve this distributed tracing comes in the picture.
+   
+# Distributed tracing via spring-cloud-slueth
+
+    It assign an uniqueId for all the request by which logger can be traced through this id.
+
 
   #1.Project - limit-service
   
@@ -126,6 +135,11 @@ Step wise microservice tutorial
 	    public static void main(String[] args) {
 		    SpringApplication.run(CurrencyExchangeServiceApplication.class, args);
 	    }
+	    
+	    @Bean
+	    public Sampler defaultSampler(){
+		return Sampler.ALWAYS_SAMPLE;
+	    }
     }
   
   4.3 ExchangeValue.java
@@ -230,8 +244,13 @@ Step wise microservice tutorial
      @EnableDiscoveryClient
      public class CurrencyConversionServiceApplication {
         public static void main(String[] args) {
-		      SpringApplication.run(CurrencyConversionServiceApplication.class, args);
-	      }
+		SpringApplication.run(CurrencyConversionServiceApplication.class, args);
+	}
+	
+	@Bean
+	public Sampler defaultSampler(){
+		return Sampler.ALWAYS_SAMPLE;
+	}
      }
   
    5.5 CurrencyExchangeServiceProxy.java
@@ -263,6 +282,11 @@ Step wise microservice tutorial
     public class NetflixEurekaNamingServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(NetflixEurekaNamingServerApplication.class, args);
+	}
+	
+	@Bean
+	public Sampler defaultSampler(){
+		return Sampler.ALWAYS_SAMPLE;
 	}
     }
  
