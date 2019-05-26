@@ -1,73 +1,69 @@
-# spring-microservice
-Step wise microservice tutorial
+# Project 5 Enhancement 4: currency-conversion-service
+  
+  Implementation of load balancer using Ribbon - 
+	If multiple instance of currency-exchange-service is executing then instead of configuring hard coded url/port, load balancer           ribbon will be used.
+  
+  Setting up Zuul API Gateway between microservice invocations -
+      
+       'currency-conversion-service' will invoked zuul api gateway 'netflix-zuul-api-gateway-server' and this will redirect invocation           to 'currency-exchange-service'
+
+  5.1 CurrencyConversionBean.java (pojo)
+    
+    @Getter @Setter @No-arg-constructor @arg-constructor
+    public class CurrencyConversionBean {
+	    private Long id;
+	    private String from;
+	    private String to;
+	    private BigDecimal conversionMultiple;
+	    private BigDecimal quantity;
+	    private BigDecimal totalCalculatedAmount;
+	    private int port;
+    }
 
 
-  #1.Project - limit-service
+  5.2 CurrencyConversionController.java
   
-  1.1 LimitConfiguration.java (pojo)
-      
-      class LimitConfiguration{
-          @Getter @setter
-          int maximum,minimum;
-      }
-      
-   1.2 application.properties
-      
-      spring.application.name=limit-service
-      limit-service.minimum=9
-      limit-service.maximum=999
-      
-   1.3 Configuration.java
-   
-      @Component
-      @ConfigurationProperties("limit-service")
-      class configuration{
-        @Getter @Setter
-        private int minimum,maximum;
-      }
-  
-  1.4 LimitConfigurationController.java
-  
-      @RestController
-      class LimitConfigurationController{
+    @RestController
+    public class CurrencyConversionController {
+    
+        @Autowired
+	private CurrencyExchangeServiceProxy proxy;    
         
-        @Autowired private Configuration configuration;
-        
-        @GetMapping("/limits")
-        public LimitConfiguration retrieveData(){
-            return new LimitConfiguration(configuration.getMaximum(), configurtion.getMinimum());
-        }
-        
-      }
-      
-      
-   1.5 LimitServiceApplication.java
-       
-       @SpringBootApplication
-       class LimitServiceApplication{
-           public static void main(String ...s){
-              SpringApplication.run(LimitServiceApplication.class,args);
-           }
-       }
-   
+        @GetMapping("/currency-converter-feign/from/{from}/to/{to}/quantity/{quantity}")
+	public CurrencyConversionBean convertCurrencyFeign(@PathVariable String from, @PathVariable String to,
+			    @PathVariable BigDecimal quantity) {
+
+		CurrencyConversionBean response = proxy.retrieveExchangeValue(from, to);
+		return new CurrencyConversionBean(response.getId(), from, to, response.getConversionMultiple(), quantity,
+				        quantity.multiply(response.getConversionMultiple()), response.getPort());
+	 }
+    }
   
+  5.3 application.properties
   
+    spring.application.name=currency-conversion-service
+    server.port=8100
+    #currency-exchange-service.ribbon.listOfServers=http://localhost:8000,http://localhost:8001
+    eureka.client.service-url.default-zone=http://localhost:8761/eureka
   
+  5.4 CurrencyConversionServiceApplication.java
   
+     @SpringBootApplication
+     @EnableFeignClients("{replace_this_with_package_of_proxy_interface_CurrencyExchangeServiceProxy}")
+     @EnableDiscoveryClient
+     public class CurrencyConversionServiceApplication {
+        public static void main(String[] args) {
+		      SpringApplication.run(CurrencyConversionServiceApplication.class, args);
+	      }
+     }
   
+   5.5 CurrencyExchangeServiceProxy.java
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+    //@FeignClient(name="currency-exchange-service")
+    @FeignClient(name="netflix-zuul-api-gateway-server")
+    @RibbonClient(name="currency-exchange-service")
+    public interface CurrencyExchangeServiceProxy {
+	 //@GetMapping("/currency-exchange/from/{from}/to/{to}")
+   @GetMapping("/currency-exchange-service/currency-exchange/from/{from}/to/{to}")
+	 public CurrencyConversionBean retrieveExchangeValue(@PathVariable("from") String from, @PathVariable("to") String to);
+    }
