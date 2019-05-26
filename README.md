@@ -234,7 +234,8 @@ Step wise microservice tutorial
     @FeignClient(name="currency-exchange-service")
     @RibbonClient(name="currency-exchange-service")
     public interface CurrencyExchangeServiceProxy {
-	 @GetMapping("/currency-exchange/from/{from}/to/{to}")
+	 //@GetMapping("/currency-exchange/from/{from}/to/{to}")
+	 @GetMapping("/currency-exchange-service/currency-exchange/from/{from}/to/{to}")
 	 public CurrencyConversionBean retrieveExchangeValue(@PathVariable("from") String from, @PathVariable("to") String to);
     }
   
