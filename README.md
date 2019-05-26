@@ -425,6 +425,18 @@ Implementation steps -
 	   	http://localhost:8080/bus/refresh
 		
 	
+   # Fault tolerance using Hysterix
+   	1. Dependency to be added {org.springframework.cloud, spring-cloud-starter-hystrix}
+	2. @SpringbootApplication
+	   @EnableHystrix
+	   public class LimitserviceApplication{...}
+	
+	3. LimitConfigurationcontroller.java
+		@GetMapping("/fault-tolerance-example")
+		@HystrixCommand(fallbackmethod="fallbackRetrieve")
+		public Limitconfiguration retrieveConfiguration{...}
+		
+		public LimitConfiguration fallbackRetrieve(){...}
 	
 	
   
