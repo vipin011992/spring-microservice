@@ -1,69 +1,63 @@
-# spring-microservice
-Step wise microservice tutorial
+# Project 7 - netflix-zuul-api-gateway-server
 
-
-  #1.Project - limit-service
-  
-  1.1 LimitConfiguration.java (pojo)
+Introduction of api-gateway using zuul.
+    
+  7.1 NetflixZuulApiGatewayServerApplication
       
-      class LimitConfiguration{
-          @Getter @setter
-          int maximum,minimum;
+      @EnableZuulProxy
+      @EnableDiscoveryClient
+      @SpringBootApplication
+      public class NetflixZuulApiGatewayServerApplication {
+        public static void main(String[] args) {
+		      SpringApplication.run(NetflixZuulApiGatewayServerApplication.class, args);
+	      }
       }
       
-   1.2 application.properties
+   7.2 application.properties
       
-      spring.application.name=limit-service
-      limit-service.minimum=9
-      limit-service.maximum=999
+      spring.application.name=netflix-zuul-api-gateway-server
+      server.port=8765
+      eureka.client.service-url.default-zone=http://localhost:8761/eureka
       
-   1.3 Configuration.java
+   7.3 ZuulLoggingFilter.java
    
       @Component
-      @ConfigurationProperties("limit-service")
-      class configuration{
-        @Getter @Setter
-        private int minimum,maximum;
-      }
-  
-  1.4 LimitConfigurationController.java
-  
-      @RestController
-      class LimitConfigurationController{
+      public class ZuulLoggingFilter extends ZuulFilter{
+        private Logger logger = LoggerFactory.getLogger(this.getClass());
         
-        @Autowired private Configuration configuration;
+        @Override
+        public boolean shouldFilter() { return true; }
         
-        @GetMapping("/limits")
-        public LimitConfiguration retrieveData(){
-            return new LimitConfiguration(configuration.getMaximum(), configurtion.getMinimum());
+        @Override
+        public Object run() {
+          HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+          logger.info("request -> {} request uri -> {}", request, request.getRequestURI());
+          return null;
         }
+
+	      @Override
+	      public String filterType() { return "pre"; }
         
+        @Override
+        public int filterOrder() { return 1; }
       }
+
+shouldFilter() :- This method will decide, filter is applied or not, if method return true it means filter will be applied.
+filterOrder :- This method is useful to define filter order execution when multiple filter are declared.
+filterType :- 
+    return value can be of pre,post and error.
+    pre - filter will be executed before filter execution
+    post - filter will be executed after filter execution
+    error - filter will be executed when exception raise.
+  
+  7.4 To intercept url on this filter below url will be constructed :
       
+      http://localhost:8765/{application-name}/{uri}
       
-   1.5 LimitServiceApplication.java
-       
-       @SpringBootApplication
-       class LimitServiceApplication{
-           public static void main(String ...s){
-              SpringApplication.run(LimitServiceApplication.class,args);
-           }
-       }
-   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+      For Example:
+      http://localhost:8765/currency-conversion-service/currency-conversion/from/INR/to/USD/quantity/10
+      currency-conversion-service - application name
+      currency-conversion/from/INR/to/USD/quantity/10 - uri
   
   
   
